@@ -1,7 +1,8 @@
 'use client'
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
 import Image from "next/image";
+import { createClient } from "@/utils/supabase/client";
 
 const TAGS = ["All", "Project", "Concept", "Editorial", "Art"];
 
@@ -31,7 +32,7 @@ function ParallaxCard({ project, onClick }: { project: any, onClick: () => void 
         opacity: { duration: 0.6, ease: "easeOut" } 
       }}
       onClick={onClick}
-      className={`relative group cursor-none overflow-hidden bg-zinc-950 border border-zinc-900/50 rounded-sm ${
+      className={`relative group cursor-none overflow-hidden bg-zinc-100 border border-zinc-200/50 rounded-sm ${
         project.size === 'tall' ? 'md:row-span-3' : 
         project.size === 'wide' ? 'md:col-span-2 md:row-span-2' : 
         'md:row-span-2'
@@ -45,9 +46,9 @@ function ParallaxCard({ project, onClick }: { project: any, onClick: () => void 
           className="object-cover grayscale group-hover:grayscale-0 transition-all duration-1000 opacity-50 group-hover:opacity-100" 
         />
       </motion.div>
-      <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex flex-col justify-end p-8 pointer-events-none">
+      <div className="absolute inset-0 bg-gradient-to-t from-white via-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex flex-col justify-end p-8 pointer-events-none">
         <p className="font-sans text-[9px] uppercase tracking-widest text-[#ff3355] mb-1 font-bold">{project.tag}</p>
-        <h4 className="font-serif italic text-2xl text-white">{project.title}</h4>
+        <h4 className="font-serif italic text-2xl text-black">{project.title}</h4>
       </div>
     </motion.div>
   );
@@ -56,11 +57,23 @@ function ParallaxCard({ project, onClick }: { project: any, onClick: () => void 
 export function Gallery() {
   const [activeTag, setActiveTag] = useState("All");
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [projects, setProjects] = useState<any[]>(PROJECTS);
   
-  const filtered = activeTag === "All" ? PROJECTS : PROJECTS.filter(p => p.tag === activeTag);
+  useEffect(() => {
+    async function loadProjects() {
+      const supabase = createClient();
+      const { data } = await supabase.from('projects').select('*').order('created_at', { ascending: false });
+      if (data && data.length > 0) {
+        setProjects(data);
+      }
+    }
+    loadProjects();
+  }, []);
+
+  const filtered = activeTag === "All" ? projects : projects.filter(p => p.tag === activeTag);
 
   return (
-    <section id="work" className="max-w-7xl mx-auto px-6 py-32 relative z-10 bg-[#050505]">
+    <section id="work" className="max-w-7xl mx-auto px-6 py-32 relative z-10 bg-white">
       {/* Filter Menu */}
       <div className="flex flex-col items-center mb-24">
         <div className="flex flex-wrap justify-center gap-10">
@@ -69,7 +82,7 @@ export function Gallery() {
               key={tag}
               onClick={() => setActiveTag(tag)}
               className={`relative font-sans text-[10px] uppercase tracking-[0.4em] transition-all cursor-none py-2 duration-500 ${
-                activeTag === tag ? "text-[#ff3355]" : "text-zinc-400 hover:text-white"
+                activeTag === tag ? "text-[#ff3355]" : "text-zinc-500 hover:text-black"
               }`}
             >
               {tag}
@@ -107,25 +120,30 @@ export function Gallery() {
               exit={{ opacity: 0 }} 
               transition={{ duration: 0.5, ease: "easeOut" }}
               onClick={() => setSelectedId(null)} 
-              className="absolute inset-0 bg-black/95 backdrop-blur-2xl" 
+              className="absolute inset-0 bg-white/95 backdrop-blur-2xl" 
             />
             <motion.div 
               layoutId={`card-${selectedId}`} 
               transition={{ type: "spring", stiffness: 120, damping: 20 }}
-              className="relative bg-black border border-zinc-800 w-full max-w-6xl h-full max-h-[85vh] overflow-hidden grid grid-cols-1 md:grid-cols-2 shadow-[0_0_80px_rgba(255,51,85,0.08)]"
+              className="relative bg-white border border-zinc-200 w-full max-w-6xl h-full max-h-[85vh] overflow-hidden grid grid-cols-1 md:grid-cols-2 shadow-[0_0_80px_rgba(255,51,85,0.08)]"
             >
               {/* Modal Content */}
-              <div className="relative h-full w-full bg-zinc-900">
-                <Image src={PROJECTS.find(p=>p.id===selectedId)?.url || ""} alt="view" fill className="object-cover" />
+              <div className="relative h-full w-full bg-zinc-100">
+                <Image src={projects.find(p=>p.id===selectedId)?.url || ""} alt="view" fill className="object-cover" />
               </div>
-              <div className="p-12 flex flex-col justify-between bg-black">
+              <div className="p-12 flex flex-col justify-between bg-white text-black">
                 <div>
                    <span className="font-sans text-[10px] text-[#ff3355] block mb-4 tracking-[0.4em] uppercase font-bold">Project Detail</span>
-                   <h2 className="font-serif italic text-5xl md:text-7xl text-white">BEVVLEN /{PROJECTS.find(p=>p.id===selectedId)?.title}</h2>
+                   <h2 className="font-serif italic text-5xl md:text-7xl">BEVVLEN /{projects.find(p=>p.id===selectedId)?.title}</h2>
+                   {projects.find(p=>p.id===selectedId)?.description && (
+                     <p className="mt-8 font-sans text-sm text-zinc-600 leading-relaxed max-w-lg">
+                       {projects.find(p=>p.id===selectedId)?.description}
+                     </p>
+                   )}
                 </div>
                 <button 
                   onClick={() => setSelectedId(null)} 
-                  className="font-sans text-[10px] uppercase tracking-[0.5em] text-white border border-zinc-800 py-4 hover:bg-[#ff3355] hover:border-[#ff3355] transition-all cursor-none"
+                  className="font-sans text-[10px] uppercase tracking-[0.5em] text-black border border-zinc-200 py-4 hover:bg-[#ff3355] hover:border-[#ff3355] hover:text-white transition-all cursor-none"
                 >
                   Return to Index
                 </button>

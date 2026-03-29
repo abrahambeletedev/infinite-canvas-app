@@ -33,8 +33,8 @@ export function Hero() {
           transition={{ duration: 1 }}
           className="flex items-center justify-center gap-4 mb-8"
         >
-          <span className="font-sans text-[10px] uppercase tracking-[0.5em] text-zinc-400 italic">Project Index</span>
-          <motion.span className="font-serif italic text-2xl text-white underline underline-offset-4 decoration-zinc-800">
+          <span className="font-sans text-[10px] uppercase tracking-[0.5em] text-zinc-500 italic">Project Index</span>
+          <motion.span className="font-serif italic text-2xl text-black underline underline-offset-4 decoration-zinc-300">
             {rounded}
           </motion.span>
         </motion.div>
@@ -43,7 +43,7 @@ export function Hero() {
           variants={containerVars}
           initial="initial"
           animate="visible"
-          className="font-serif italic text-[18vw] md:text-[14rem] leading-none tracking-tighter text-white flex overflow-hidden text-mask"
+          className="font-serif italic text-[18vw] md:text-[14rem] leading-none tracking-tighter text-black flex overflow-hidden text-mask"
         >
           {title.split("").map((char, i) => (
             <motion.span key={i} variants={letterVars} className="inline-block">
@@ -56,7 +56,7 @@ export function Hero() {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 1.2, duration: 1.5, ease: "easeOut" }}
-          className="mt-10 font-sans text-[9px] md:text-[11px] uppercase tracking-[1.2em] text-zinc-400 ml-[1.2em]"
+          className="mt-10 font-sans text-[9px] md:text-[11px] uppercase tracking-[1.2em] text-zinc-500 ml-[1.2em]"
         >
           Architecture of Digital Emotion
         </motion.p>

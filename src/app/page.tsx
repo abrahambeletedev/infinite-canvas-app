@@ -24,7 +24,7 @@ export default function Home() {
   const footerScale = useTransform(scrollYProgress, [0.94, 1], [0.9, 1]);
 
   return (
-    <main ref={containerRef} className="relative bg-[#050505] cursor-none min-h-[500vh]">
+    <main ref={containerRef} className="relative bg-white cursor-none min-h-[500vh]">
       <CustomCursor />
       <Navbar />
 
@@ -39,22 +39,22 @@ export default function Home() {
       {/* MAIN CONTENT BLOCK */}
       <motion.div 
         style={{ opacity: contentOpacity }}
-        className="relative z-10 w-full bg-[#050505] mt-[100vh]"
+        className="relative z-10 w-full bg-white mt-[100vh]"
       >
         <Gallery />
         <About />
         <Contact />
 
         {/* REFINED FOOTER SECTION */}
-        <footer className="relative h-screen flex flex-col items-center justify-center bg-[#050505] border-t border-zinc-900/50 overflow-hidden">
+        <footer className="relative h-screen flex flex-col items-center justify-center bg-white border-t border-zinc-200 overflow-hidden">
           <motion.div style={{ opacity: footerOpacity, scale: footerScale }} className="text-center">
             {/* Signature BEVVLEN with subtle Red Aura */}
-            <p className="font-signature text-[12rem] md:text-[22rem] text-white/5 leading-none select-none tracking-tighter drop-shadow-[0_0_30px_rgba(255,51,85,0.05)]">
+            <p className="font-signature text-[12rem] md:text-[22rem] text-black/5 leading-none select-none tracking-tighter drop-shadow-[0_0_30px_rgba(255,51,85,0.05)]">
               BEVVLEN
             </p>
             <div className="mt-8 flex flex-col items-center gap-4">
               <div className="h-12 w-[1px] bg-gradient-to-b from-[#ff3355] to-transparent" />
-              <div className="font-sans text-[10px] uppercase tracking-[1.5em] text-zinc-400">
+              <div className="font-sans text-[10px] uppercase tracking-[1.5em] text-zinc-500">
                 Architecture of Digital Emotion — 2026
               </div>
             </div>
