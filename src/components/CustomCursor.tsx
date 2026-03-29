@@ -13,8 +13,8 @@ export function CustomCursor() {
     img: null
   });
 
-  const cursorX = useSpring(0, { stiffness: 800, damping: 40 });
-  const cursorY = useSpring(0, { stiffness: 800, damping: 40 });
+  const cursorX = useSpring(-100, { stiffness: 500, damping: 28 });
+  const cursorY = useSpring(-100, { stiffness: 500, damping: 28 });
 
   useEffect(() => {
     const moveCursor = (e: MouseEvent) => {
@@ -52,11 +52,10 @@ export function CustomCursor() {
           width: hoverData.img ? "120px" : (hoverData.isTab ? "45px" : "12px"),
           height: hoverData.img ? "160px" : (hoverData.isTab ? "45px" : "12px"),
           borderRadius: hoverData.img ? "4px" : "100%",
-          // Mix blend difference makes it white on black, black on white
-          mixBlendMode: hoverData.isTab ? "normal" : "difference",
-          // Border logic
-          border: hoverData.isTab ? "1px solid #ff3355" : "1px solid white",
-          backgroundColor: hoverData.isTab ? "rgba(255, 51, 85, 0.05)" : (hoverData.isPointer && !hoverData.img ? "white" : "transparent"),
+          mixBlendMode: "normal",
+          // Border logic: using accent color to always be visible and smooth
+          border: hoverData.img ? "none" : "1.5px solid #ff3355",
+          backgroundColor: hoverData.isTab ? "rgba(255, 51, 85, 0.1)" : (hoverData.isPointer && !hoverData.img ? "#ff3355" : "transparent"),
         }}
         animate={{
           scale: hoverData.isPointer && !hoverData.isTab ? 2.5 : 1,

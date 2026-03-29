@@ -31,7 +31,7 @@ export default function Home() {
       {/* TOP BRANDING */}
       <motion.section 
         style={{ opacity: heroOpacity, display: heroDisplay }}
-        className="fixed top-0 left-0 w-full h-screen z-50 flex items-center justify-center pointer-events-none"
+        className="fixed top-0 left-0 w-full h-screen z-0 flex items-center justify-center pointer-events-none"
       >
         <Hero />
       </motion.section>
@@ -39,7 +39,7 @@ export default function Home() {
       {/* MAIN CONTENT BLOCK */}
       <motion.div 
         style={{ opacity: contentOpacity }}
-        className="relative z-10 w-full bg-white mt-[100vh]"
+        className="relative z-20 w-full bg-white mt-[100vh]"
       >
         <Gallery />
         <About />
