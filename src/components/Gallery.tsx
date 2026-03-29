@@ -27,8 +27,8 @@ function ParallaxCard({ project, onClick }: { project: any, onClick: () => void 
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.9, transition: { duration: 0.2 } }}
       transition={{ 
-        layout: { type: "spring", stiffness: 200, damping: 25 },
-        opacity: { duration: 0.4 } 
+        layout: { type: "spring", stiffness: 100, damping: 20 },
+        opacity: { duration: 0.6, ease: "easeOut" } 
       }}
       onClick={onClick}
       className={`relative group cursor-none overflow-hidden bg-zinc-950 border border-zinc-900/50 rounded-sm ${
@@ -68,8 +68,8 @@ export function Gallery() {
             <button
               key={tag}
               onClick={() => setActiveTag(tag)}
-              className={`relative font-sans text-[10px] uppercase tracking-[0.4em] transition-all cursor-none py-2 ${
-                activeTag === tag ? "text-[#ff3355]" : "text-zinc-600 hover:text-zinc-400"
+              className={`relative font-sans text-[10px] uppercase tracking-[0.4em] transition-all cursor-none py-2 duration-500 ${
+                activeTag === tag ? "text-[#ff3355]" : "text-zinc-400 hover:text-white"
               }`}
             >
               {tag}
@@ -105,11 +105,13 @@ export function Gallery() {
               initial={{ opacity: 0 }} 
               animate={{ opacity: 1 }} 
               exit={{ opacity: 0 }} 
+              transition={{ duration: 0.5, ease: "easeOut" }}
               onClick={() => setSelectedId(null)} 
               className="absolute inset-0 bg-black/95 backdrop-blur-2xl" 
             />
             <motion.div 
               layoutId={`card-${selectedId}`} 
+              transition={{ type: "spring", stiffness: 120, damping: 20 }}
               className="relative bg-black border border-zinc-800 w-full max-w-6xl h-full max-h-[85vh] overflow-hidden grid grid-cols-1 md:grid-cols-2 shadow-[0_0_80px_rgba(255,51,85,0.08)]"
             >
               {/* Modal Content */}

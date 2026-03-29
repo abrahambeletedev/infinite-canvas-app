@@ -54,7 +54,7 @@ export default function Home() {
             </p>
             <div className="mt-8 flex flex-col items-center gap-4">
               <div className="h-12 w-[1px] bg-gradient-to-b from-[#ff3355] to-transparent" />
-              <div className="font-sans text-[10px] uppercase tracking-[1.5em] text-zinc-700">
+              <div className="font-sans text-[10px] uppercase tracking-[1.5em] text-zinc-400">
                 Architecture of Digital Emotion — 2026
               </div>
             </div>

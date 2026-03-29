@@ -20,7 +20,7 @@ export function Hero() {
     initial: { y: "100%" },
     visible: { 
       y: 0, 
-      transition: { duration: 1.4, ease: [0.16, 1, 0.3, 1] as any } 
+      transition: { duration: 1.8, ease: [0.22, 1, 0.36, 1] as any } 
     }
   };
 
@@ -33,7 +33,7 @@ export function Hero() {
           transition={{ duration: 1 }}
           className="flex items-center justify-center gap-4 mb-8"
         >
-          <span className="font-sans text-[10px] uppercase tracking-[0.5em] text-zinc-600 italic">Project Index</span>
+          <span className="font-sans text-[10px] uppercase tracking-[0.5em] text-zinc-400 italic">Project Index</span>
           <motion.span className="font-serif italic text-2xl text-white underline underline-offset-4 decoration-zinc-800">
             {rounded}
           </motion.span>
@@ -55,8 +55,8 @@ export function Hero() {
         <motion.p 
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1.2, duration: 1 }}
-          className="mt-10 font-sans text-[9px] md:text-[11px] uppercase tracking-[1.2em] text-zinc-500 ml-[1.2em]"
+          transition={{ delay: 1.2, duration: 1.5, ease: "easeOut" }}
+          className="mt-10 font-sans text-[9px] md:text-[11px] uppercase tracking-[1.2em] text-zinc-400 ml-[1.2em]"
         >
           Architecture of Digital Emotion
         </motion.p>
