@@ -12,55 +12,32 @@ export default function Home() {
   const containerRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: containerRef, offset: ["start start", "end end"] });
 
-  // BEVVLEN Hero fades out quickly and disappears permanently
-  const heroOpacity = useTransform(scrollYProgress, [0, 0.05], [1, 0]);
-  const heroDisplay = useTransform(scrollYProgress, (pos) => pos > 0.05 ? "none" : "flex");
-  
-  // Content fades in right after
-  const contentOpacity = useTransform(scrollYProgress, [0.08, 0.15], [0, 1]);
-
-  // Footer Branding: Triggered at the absolute end
-  const footerOpacity = useTransform(scrollYProgress, [0.94, 0.99], [0, 1]);
-  const footerScale = useTransform(scrollYProgress, [0.94, 1], [0.9, 1]);
+  // Subtle fade for the footer approach
+  const footerOpacity = useTransform(scrollYProgress, [0.9, 0.98], [0, 1]);
 
   return (
-    <main ref={containerRef} className="relative bg-white cursor-none min-h-[500vh]">
+    <main ref={containerRef} className="relative bg-white cursor-none min-h-screen">
       <CustomCursor />
       <Navbar />
 
-      {/* TOP BRANDING */}
-      <motion.section 
-        style={{ opacity: heroOpacity, display: heroDisplay }}
-        className="fixed top-0 left-0 w-full h-screen z-0 flex items-center justify-center pointer-events-none"
-      >
+      {/* TOP BRANDING - Normal static flow instead of glitchy fixed stack */}
+      <section className="relative w-full h-screen z-0 flex items-center justify-center pointer-events-none">
         <Hero />
-      </motion.section>
+      </section>
 
       {/* MAIN CONTENT BLOCK */}
-      <motion.div 
-        style={{ opacity: contentOpacity }}
-        className="relative z-20 w-full bg-white mt-[100vh]"
-      >
+      <div className="relative z-20 w-full bg-white">
         <Gallery />
         <About />
         <Contact />
 
-        {/* REFINED FOOTER SECTION */}
-        <footer className="relative h-screen flex flex-col items-center justify-center bg-white border-t border-zinc-200 overflow-hidden">
-          <motion.div style={{ opacity: footerOpacity, scale: footerScale }} className="text-center">
-            {/* Signature BEVVLEN with subtle Red Aura */}
-            <p className="font-signature text-[12rem] md:text-[22rem] text-black/5 leading-none select-none tracking-tighter drop-shadow-[0_0_30px_rgba(255,51,85,0.05)]">
-              BEVVLEN
-            </p>
-            <div className="mt-8 flex flex-col items-center gap-4">
-              <div className="h-12 w-[1px] bg-gradient-to-b from-[#ff3355] to-transparent" />
-              <div className="font-sans text-[10px] uppercase tracking-[1.5em] text-zinc-500">
-                Architecture of Digital Emotion — 2026
-              </div>
-            </div>
+        {/* REFINED FOOTER SECTION - Hero reappears */}
+        <footer className="relative h-screen flex flex-col items-center justify-center bg-zinc-50 border-t border-zinc-200 overflow-hidden">
+          <motion.div style={{ opacity: footerOpacity }} className="pointer-events-none">
+             <Hero />
           </motion.div>
         </footer>
-      </motion.div>
+      </div>
     </main>
   );
 }
