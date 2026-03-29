@@ -12,9 +12,6 @@ export default function Home() {
   const containerRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: containerRef, offset: ["start start", "end end"] });
 
-  // Subtle fade for the footer approach
-  const footerOpacity = useTransform(scrollYProgress, [0.9, 0.98], [0, 1]);
-
   return (
     <main ref={containerRef} className="relative bg-white cursor-none min-h-screen">
       <CustomCursor />
@@ -33,9 +30,9 @@ export default function Home() {
 
         {/* REFINED FOOTER SECTION - Hero reappears */}
         <footer className="relative h-screen flex flex-col items-center justify-center bg-zinc-50 border-t border-zinc-200 overflow-hidden">
-          <motion.div style={{ opacity: footerOpacity }} className="pointer-events-none">
+          <div className="pointer-events-none">
              <Hero />
-          </motion.div>
+          </div>
         </footer>
       </div>
     </main>
