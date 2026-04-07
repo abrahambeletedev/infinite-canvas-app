@@ -9,10 +9,12 @@ export default function AdminDashboard() {
   const [projects, setProjects] = useState<any[]>([])
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
-  const [tag, setTag] = useState('Project') // Default
-  const [size, setSize] = useState('small') // Default
+  const [tag, setTag] = useState('Project')
+  const [size, setSize] = useState('small')
   const [year, setYear] = useState('2026')
-  const [file, setFile] = useState<File | null>(null)
+  const [dimensions, setDimensions] = useState('')
+  const [materials, setMaterials] = useState('')
+  const [files, setFiles] = useState<FileList | null>(null)
   
   const [uploading, setUploading] = useState(false)
   const [refresh, setRefresh] = useState(0)
@@ -33,15 +35,18 @@ export default function AdminDashboard() {
     router.push('/admin/login')
   }
 
-  const handleDelete = async (id: string, url: string) => {
-    // Extract filename from URL (e.g., https://.../project-images/filename.jpg)
+  const handleDelete = async (id: string, images: string[] = []) => {
+    if (!confirm('Are you sure you want to delete this project?')) return
+
     try {
-      const fileName = url.split('/').pop()
-      if (fileName) {
-        await supabase.storage.from('project-images').remove([fileName])
+      if (images && images.length > 0) {
+        const fileNames = images.map(url => url.split('/').pop()).filter(Boolean) as string[]
+        if (fileNames.length > 0) {
+          await supabase.storage.from('project-images').remove(fileNames)
+        }
       }
     } catch (err) {
-      console.error('Failed to delete image', err)
+      console.error('Failed to delete images', err)
     }
 
     await supabase.from('projects').delete().eq('id', id)
@@ -50,44 +55,59 @@ export default function AdminDashboard() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!file) return alert('Please select an image')
+    if (!files || files.length === 0) return alert('Please select at least one image')
 
     setUploading(true)
+    const uploadedUrls: string[] = []
 
-    // 1. Upload file to Supabase Storage
-    const fileExt = file.name.split('.').pop()
-    const fileName = `${Math.random()}.${fileExt}`
-    const { error: uploadError, data } = await supabase.storage
-      .from('project-images')
-      .upload(fileName, file)
+    try {
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i]
+        const fileExt = file.name.split('.').pop()
+        const fileName = `${Math.random()}.${fileExt}`
+        
+        const { error: uploadError } = await supabase.storage
+          .from('project-images')
+          .upload(fileName, file)
 
-    if (uploadError) {
-      alert(`Upload Error: ${uploadError.message}`)
-      setUploading(false)
-      return
-    }
+        if (uploadError) throw uploadError
 
-    // 2. Get public URL
-    const { data: { publicUrl } } = supabase.storage
-      .from('project-images')
-      .getPublicUrl(fileName)
+        const { data: { publicUrl } } = supabase.storage
+          .from('project-images')
+          .getPublicUrl(fileName)
+          
+        uploadedUrls.push(publicUrl)
+      }
 
-    // 3. Insert into Database
-    const { error: dbError } = await supabase.from('projects').insert([
-      { title, description, tag, url: publicUrl, size, year }
-    ])
+      const { error: dbError } = await supabase.from('projects').insert([
+        { 
+          title, 
+          description, 
+          tag, 
+          url: uploadedUrls[0], // Main cover
+          images: uploadedUrls, // All images
+          size, 
+          year,
+          dimensions,
+          materials
+        }
+      ])
 
-    if (dbError) {
-      alert(`DB Error: ${dbError.message}`)
-    } else {
+      if (dbError) throw dbError
+
       // Reset form
       setTitle('')
       setDescription('')
-      setFile(null)
+      setDimensions('')
+      setMaterials('')
+      setFiles(null)
       setRefresh(r => r + 1)
+      alert('Project published successfully!')
+    } catch (error: any) {
+      alert(`Error: ${error.message}`)
+    } finally {
+      setUploading(false)
     }
-    
-    setUploading(false)
   }
 
   return (
@@ -100,7 +120,6 @@ export default function AdminDashboard() {
       </nav>
 
       <main className="max-w-7xl mx-auto p-8 grid grid-cols-1 lg:grid-cols-3 gap-16">
-        {/* ADD PROJECT FORM */}
         <section className="col-span-1 border border-zinc-200 p-8 shadow-sm rounded-sm">
           <h2 className="text-xs uppercase tracking-[0.3em] text-zinc-500 mb-8 border-b border-zinc-200 pb-2">Add New Project</h2>
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -112,6 +131,17 @@ export default function AdminDashboard() {
             <div>
               <label className="block text-[10px] uppercase font-bold tracking-widest text-zinc-700 mb-2">Description</label>
               <textarea required value={description} onChange={e => setDescription(e.target.value)} rows={3} className="w-full border border-zinc-200 p-2 text-sm focus:outline-none focus:border-[#ff3355]" />
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-[10px] uppercase font-bold tracking-widest text-zinc-700 mb-2">Dimensions</label>
+                <input type="text" placeholder="e.g. 120x80cm" value={dimensions} onChange={e => setDimensions(e.target.value)} className="w-full border border-zinc-200 p-2 text-sm focus:outline-none focus:border-[#ff3355]" />
+              </div>
+              <div>
+                <label className="block text-[10px] uppercase font-bold tracking-widest text-zinc-700 mb-2">Materials</label>
+                <input type="text" placeholder="e.g. Oil on Canvas" value={materials} onChange={e => setMaterials(e.target.value)} className="w-full border border-zinc-200 p-2 text-sm focus:outline-none focus:border-[#ff3355]" />
+              </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
@@ -140,33 +170,37 @@ export default function AdminDashboard() {
             </div>
 
             <div>
-              <label className="block text-[10px] uppercase font-bold tracking-widest text-zinc-700 mb-2">Image</label>
-              <input type="file" accept="image/*" onChange={e => setFile(e.target.files?.[0] || null)} className="w-full text-xs" />
+              <label className="block text-[10px] uppercase font-bold tracking-widest text-zinc-700 mb-2">Images (Multiple allowed)</label>
+              <input type="file" accept="image/*" multiple onChange={e => setFiles(e.target.files)} className="w-full text-xs" />
             </div>
 
             <button disabled={uploading} type="submit" className="w-full bg-black text-white py-3 text-xs uppercase tracking-widest hover:bg-[#ff3355] transition-colors disabled:opacity-50">
-              {uploading ? 'Uploading...' : 'Publish Project'}
+              {uploading ? `Uploading ${files?.length || 0} files...` : 'Publish Project'}
             </button>
           </form>
         </section>
 
-        {/* PROJECT LIST */}
         <section className="col-span-1 lg:col-span-2">
           <h2 className="text-xs uppercase tracking-[0.3em] text-zinc-500 mb-8 border-b border-zinc-200 pb-2">Existing Projects</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {projects.map(p => (
-              <div key={p.id} className="border border-zinc-200 p-4 flex gap-4 items-center bg-zinc-50 hover:bg-white transition-colors">
-                <div className="relative w-20 h-20 bg-zinc-200 flex-shrink-0">
+              <div key={p.id} className="border border-zinc-200 p-4 flex gap-4 items-start bg-zinc-50 hover:bg-white transition-colors">
+                <div className="relative w-20 h-20 bg-zinc-200 flex-shrink-0 group">
                   <Image src={p.url} alt={p.title} fill className="object-cover grayscale" />
+                  {p.images?.length > 1 && (
+                    <div className="absolute top-0 right-0 bg-black text-white text-[8px] px-1 py-0.5">
+                      +{p.images.length - 1}
+                    </div>
+                  )}
                 </div>
-                <div className="flex-1">
-                  <h3 className="font-serif italic text-xl font-bold">{p.title}</h3>
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-serif italic text-xl font-bold truncate">{p.title}</h3>
                   <p className="text-[10px] uppercase tracking-widest text-zinc-500 mt-1">{p.tag} / {p.year}</p>
-                  <p className="text-xs text-zinc-600 mt-2 line-clamp-1">{p.description}</p>
+                  <p className="text-[10px] text-zinc-400 mt-1 truncate">{p.materials} {p.dimensions && `• ${p.dimensions}`}</p>
+                  <button onClick={() => handleDelete(p.id, p.images)} className="mt-4 text-[#ff3355] text-[10px] uppercase tracking-wider hover:text-black">
+                    Delete Project
+                  </button>
                 </div>
-                <button onClick={() => handleDelete(p.id, p.url)} className="text-[#ff3355] text-xs uppercase tracking-wider hover:text-black">
-                  Delete
-                </button>
               </div>
             ))}
           </div>

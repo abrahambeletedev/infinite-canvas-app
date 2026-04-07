@@ -125,28 +125,68 @@ export function Gallery() {
             <motion.div 
               layoutId={`card-${selectedId}`} 
               transition={{ type: "spring", stiffness: 120, damping: 20 }}
-              className="relative bg-white border border-zinc-200 w-full max-w-6xl h-full max-h-[85vh] overflow-hidden grid grid-cols-1 md:grid-cols-2 shadow-[0_0_80px_rgba(255,51,85,0.08)]"
+              className="relative bg-white border border-zinc-200 w-full max-w-6xl h-full max-h-[90vh] overflow-hidden grid grid-cols-1 md:grid-cols-2 shadow-[0_0_80px_rgba(255,51,85,0.08)]"
             >
-              {/* Modal Content */}
-              <div className="relative h-full w-full bg-zinc-100">
-                <Image src={projects.find(p=>p.id===selectedId)?.url || ""} alt="view" fill className="object-cover" />
+              {/* Modal Content - Multi-image Scroll */}
+              <div className="relative h-full w-full bg-zinc-100 overflow-y-auto no-scrollbar snap-y snap-mandatory">
+                {projects.find(p => p.id === selectedId)?.images?.length > 0 ? (
+                  projects.find(p => p.id === selectedId).images.map((img: string, idx: number) => (
+                    <div key={idx} className="relative w-full h-full min-h-[400px] md:min-h-full snap-start">
+                      <Image src={img} alt={`view-${idx}`} fill className="object-cover" />
+                    </div>
+                  ))
+                ) : (
+                  <div className="relative h-full w-full">
+                    <Image src={projects.find(p => p.id === selectedId)?.url || ""} alt="view" fill className="object-cover" />
+                  </div>
+                )}
               </div>
-              <div className="p-12 flex flex-col justify-between bg-white text-black">
-                <div>
-                   <span className="font-sans text-[10px] text-[#ff3355] block mb-4 tracking-[0.4em] uppercase font-bold">Project Detail</span>
-                   <h2 className="font-serif italic text-5xl md:text-7xl">BEVVLEN /{projects.find(p=>p.id===selectedId)?.title}</h2>
-                   {projects.find(p=>p.id===selectedId)?.description && (
-                     <p className="mt-8 font-sans text-sm text-zinc-600 leading-relaxed max-w-lg">
-                       {projects.find(p=>p.id===selectedId)?.description}
+
+              <div className="p-8 md:p-16 flex flex-col justify-between bg-white text-black overflow-y-auto">
+                <div className="space-y-8">
+                   <div className="space-y-2">
+                     <span className="font-sans text-[10px] text-[#ff3355] block tracking-[0.4em] uppercase font-bold">Project Detail</span>
+                     <h2 className="font-serif italic text-4xl md:text-6xl leading-tight">
+                       BEVVLEN <br/> 
+                       <span className="text-zinc-400">/</span> {projects.find(p => p.id === selectedId)?.title}
+                     </h2>
+                   </div>
+
+                   <div className="grid grid-cols-2 gap-8 py-8 border-y border-zinc-100">
+                     <div>
+                       <p className="text-[9px] uppercase tracking-widest text-zinc-400 mb-1">Dimensions</p>
+                       <p className="text-sm font-sans underline decoration-zinc-100 underline-offset-4">{projects.find(p => p.id === selectedId)?.dimensions || "Varies"}</p>
+                     </div>
+                     <div>
+                       <p className="text-[9px] uppercase tracking-widest text-zinc-400 mb-1">Materials</p>
+                       <p className="text-sm font-sans underline decoration-zinc-100 underline-offset-4">{projects.find(p => p.id === selectedId)?.materials || "Mixed Media"}</p>
+                     </div>
+                     <div>
+                       <p className="text-[9px] uppercase tracking-widest text-zinc-400 mb-1">Year</p>
+                       <p className="text-sm font-sans underline decoration-zinc-100 underline-offset-4">{projects.find(p => p.id === selectedId)?.year || "2026"}</p>
+                     </div>
+                     <div>
+                       <p className="text-[9px] uppercase tracking-widest text-zinc-400 mb-1">Category</p>
+                       <p className="text-sm font-sans underline decoration-zinc-100 underline-offset-4">{projects.find(p => p.id === selectedId)?.tag}</p>
+                     </div>
+                   </div>
+
+                   <div>
+                     <p className="text-[9px] uppercase tracking-widest text-zinc-400 mb-4">Description</p>
+                     <p className="font-sans text-sm text-zinc-600 leading-relaxed">
+                       {projects.find(p => p.id === selectedId)?.description || "No description provided."}
                      </p>
-                   )}
+                   </div>
                 </div>
-                <button 
-                  onClick={() => setSelectedId(null)} 
-                  className="font-sans text-[10px] uppercase tracking-[0.5em] text-black border border-zinc-200 py-4 hover:bg-[#ff3355] hover:border-[#ff3355] hover:text-white transition-all cursor-none"
-                >
-                  Return to Index
-                </button>
+
+                <div className="pt-12">
+                  <button 
+                    onClick={() => setSelectedId(null)} 
+                    className="w-full font-sans text-[10px] uppercase tracking-[0.5em] text-white bg-black py-5 hover:bg-[#ff3355] transition-all cursor-none"
+                  >
+                    Return to Index
+                  </button>
+                </div>
               </div>
             </motion.div>
           </div>
